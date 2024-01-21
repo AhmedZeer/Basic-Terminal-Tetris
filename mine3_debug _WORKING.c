@@ -21,14 +21,13 @@ void cursorSet( int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-/*herhangi bir parcanin x ve y koordinatlarini
-ayrica enini, boyutunu (0 ve 1 seklinde) ifade eden bir struct.*/
+/*This Struct is used to save information about the tetrimino*/
 typedef struct {
     char **boyut;
-    int en;         /* char idi */
-    int boy;        /* char idi */
-    int x;          /* char idi */
-    int y;          /* char idi */
+    int en;        
+    int boy;      
+    int x;          
+    int y;         
     int tmp_en;
 } Parca;
 

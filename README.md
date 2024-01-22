@@ -36,8 +36,8 @@ const Parca parcalar[PARCALAR] = {
     {(char *[]){(char[]){1,1,1},(char[]){1,0,0},(char[]){0,0,0}}, 3, 2},  
 };
 ```
-So, how much easy it is to check the full rows and overwrite the above ones?
-![a](./img/graph2.png)
+So, how much easy it is to check the full rows and overwrite the above ones?<br>
+<img style="float: left" src="./img/graph2.png" alt="graph2" width="500"/>
 
 ```
 void skorlama( int r, int c, char oyun[r][c])

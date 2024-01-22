@@ -100,7 +100,7 @@ void parcaGetir( int r, int c, char oyun[r][c] )
 	Parca new_shape = parcaKopya(parcalar[rand()%PARCALAR]);
 
     new_shape.y = rand()%(c-new_shape.en+1);
-    new_shape.x = new_shape.boy-1;
+    new_shape.x = 0;
     parcaSil(eldeParca);
 	eldeParca = new_shape;
     eldeParca.tmp_en = eldeParca.en;

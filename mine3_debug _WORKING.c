@@ -21,7 +21,7 @@ void cursorSet( int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-/*This Struct is used to save information about the tetrimino*/
+/*This Struct is used to save information about the tetromino*/
 typedef struct {
     char **boyut;
     int en;        
@@ -31,25 +31,25 @@ typedef struct {
     int tmp_en;
 } Parca;
 
+/*get a tetromino*/
 Parca eldeParca;
 
+/*define matrices for each tetromino*/
 const Parca parcalar[PARCALAR] = {
-    {(char *[]){(char[]){1,1,0},(char[]){1,1,0}}, 2, 2},                       // kare sekli en 2 boyu 2
-    {(char *[]){(char[]){1,0,0}}, 1, 1},                                      // nokta sekli en 1 boyu 1
-    {(char *[]){(char[]){1,1,0},(char[]){0,1,1},(char[]){0,0,0}}, 3, 2},     // Z sekli en 3 boyu 2
-    {(char *[]){(char[]){1,1,1},(char[]){0,1,0},(char[]){0,0,0}}, 3, 2},    // T sekli en 3 boyu 2
-    {(char *[]){(char[]){1,1,1},(char[]){0,0,0},(char[]){0,0,0}}, 3, 1},   // cubuk sekli en 3 boyu 1
-    {(char *[]){(char[]){1,1,1},(char[]){1,0,0},(char[]){0,0,0}}, 3, 2},  // L sekli en 3 boyu 2
+    {(char *[]){(char[]){1,1,0},(char[]){1,1,0}}, 2, 2},                       
+    {(char *[]){(char[]){1,0,0}}, 1, 1},                                      
+    {(char *[]){(char[]){1,1,0},(char[]){0,1,1},(char[]){0,0,0}}, 3, 2},     
+    {(char *[]){(char[]){1,1,1},(char[]){0,1,0},(char[]){0,0,0}}, 3, 2},    
+    {(char *[]){(char[]){1,1,1},(char[]){0,0,0},(char[]){0,0,0}}, 3, 1},   
+    {(char *[]){(char[]){1,1,1},(char[]){1,0,0},(char[]){0,0,0}}, 3, 2},  
 };
 
 char getChar()
 {
-	return _getch();    //kullanicinin surekli Enter'a basmamasi icin fonk.
+	return _getch();    //make it real time.
 }
 
-
-/* girdi olarak verilen parcanin boyutunu kopya adli degiskende saklariz
-ardindan sutun kadar yer acariz ve son olarak her bir karakter sutunu icin yer de acariz*/
+/*make a temp for future controls and rotations*/
 Parca parcaKopya( Parca parca )
 {
 	Parca new_shape = parca;
@@ -65,9 +65,7 @@ Parca parcaKopya( Parca parca )
     return new_shape;
 }
 
-
-/* kopyalama isleminin tam tersi ilk once karakter basine dusen yeri free ediyoruz
-sonra da butun boyutunkini free ediyoruz.*/
+/*Free tetromino*/
 void parcaSil( Parca parca )            
 {
     int i;
@@ -77,8 +75,8 @@ void parcaSil( Parca parca )
     free(parca.boyut);
 }
 
-/* parca hareket ettirmek istedigimiz zaman onun 'oyun' sinirlarini assmasini VE diger parcalarin
-ustune binmesini istemiyoruz dolasıyla boyle bir kontrol fonksiyonu yapabilirz.*/
+/* Control if the tetromino transpess the mainBoard 
+ * or collide with other static tetros*/
 int koordKontrol( Parca parca, int r, int c, char oyun[r][c])
 {   
 	char **array = parca.boyut;
@@ -86,7 +84,7 @@ int koordKontrol( Parca parca, int r, int c, char oyun[r][c])
 	for( i=0 ; i<parca.en ; i++) {
 		for( j=0 ; j<parca.en ; j++){
 			if( (parca.y+j < 0 || parca.y+j >= c || parca.x+i >= r)){ //Out of borders
-				if(array[i][j]) //but is it just a phantom?
+				if(array[i][j]) 
 					return FALSE;
 			}
 			else if(oyun[parca.x+i][parca.y+j] && array[i][j])
@@ -96,7 +94,8 @@ int koordKontrol( Parca parca, int r, int c, char oyun[r][c])
 	return TRUE;
 }
 
-void parcaGetir( int r, int c, char oyun[r][c] )        // rastgele parca alma ve onu rastgele bir yere atama.
+/*get a random block and print it to a random place*/
+void parcaGetir( int r, int c, char oyun[r][c] )        
 {
 	Parca new_shape = parcaKopya(parcalar[rand()%PARCALAR]);
 
@@ -107,10 +106,11 @@ void parcaGetir( int r, int c, char oyun[r][c] )        // rastgele parca alma v
     eldeParca.tmp_en = eldeParca.en;
 	if(!koordKontrol(eldeParca, r, c, oyun)){
 		GameOn = FALSE;
-	}                           // yeni gelen parca uste binerse oyunun bitmesi icin. 
+	}                           
 }
 
-void parcaDondur1( Parca parca )                    //saat yonunde dondur. /*!!!!!!!!!!!!!!!!!!!*/
+/*rotate clockwise*/
+void parcaDondur1( Parca parca )                    
 {
 	Parca temp = parcaKopya(parca);
 	int i, j, k, width, height;
@@ -126,23 +126,8 @@ void parcaDondur1( Parca parca )                    //saat yonunde dondur. /*!!!
 	parcaSil(temp);
 }
 
-void parcaDondur2( Parca parca )                //saat yonunun tersinde dondur.
-{
-	Parca temp = parcaKopya(parca);
-	int i, j, k, width, height, tmp;
-	width = parca.en;
-    height = parca.boy;
-	for(i = 0; i < width ; i++){
-		for(j = 0, k = width-1; j < width ; j++, k--){
-				parca.boyut[i][j] = temp.boyut[i][k];
-		}
-	}
-    // parca.boy = parca.en;
-    // parca.en = height;
-	parcaSil(temp);
-}
-
-void parcaSabitle( int r, int c, char oyun[r][c] )      //parcayi oyun tahtasina sabitlemek icin.
+/*write the tetromino to the mainboard*/
+void parcaSabitle( int r, int c, char oyun[r][c] )      
 {
     int i, j;
 	for(i = 0; i < eldeParca.en ;i++){
@@ -153,6 +138,7 @@ void parcaSabitle( int r, int c, char oyun[r][c] )      //parcayi oyun tahtasina
 	}
 }
 
+/*check full rows, overwrite and score*/
 void skorlama( int r, int c, char oyun[r][c])
 {
 	int i, j, sum, count=0;
@@ -174,6 +160,7 @@ void skorlama( int r, int c, char oyun[r][c])
 	skor += 100*count*i;
 }
 
+/*print the board and the active tetromino*/
 void printleme( int r, int c, char oyun[r][c])
 {
 	char Buffer[r][c];
@@ -243,6 +230,7 @@ void printleme( int r, int c, char oyun[r][c])
     printf("╝");
 }
 
+/*just to add a quick animation when the game is over*/
 void GameOver( int r, int c, char oyun[r][c])
 {
 	char Buffer[r][c];
@@ -272,15 +260,15 @@ void GameOver( int r, int c, char oyun[r][c])
 
     cursorSet(c*2+4+1, 3-1);
     printf("△ Score: %d △\n", skor);    cursorSet(c*2+4+1, 4-1);
-    // printf("  ▹ ↓ s  ▹ ← a  ▹ → d");
-    // cursorSet(c*2+4+1, 5-1);
-    // printf("  ▹ ROTATE e");
-    // cursorSet(c*2+4+1, 6-1);
-    // printf("  ▹ DROP x");
-    // cursorSet(c*2+4+1, 7-1);
-    // printf("  ▹ Coordinate drop 1-9");
-    // cursorSet(c*2+4+1, 8-1);
-    // printf("  ▹ Quit p");
+    printf("  ▹ ↓ s  ▹ ← a  ▹ → d");
+    cursorSet(c*2+4+1, 5-1);
+    printf("  ▹ ROTATE e");
+    cursorSet(c*2+4+1, 6-1);
+    printf("  ▹ DROP x");
+    cursorSet(c*2+4+1, 7-1);
+    printf("  ▹ Coordinate drop 1-9");
+    cursorSet(c*2+4+1, 8-1);
+    printf("  ▹ Quit p");
 
     cursorSet(0,1);
     printf("╔══");
@@ -309,6 +297,7 @@ void GameOver( int r, int c, char oyun[r][c])
     printf("╝");
 }
 
+/*same thing*/
 void GameOver2( int r, int c, char oyun[r][c])
 {
 	char Buffer[r][c];
@@ -394,15 +383,12 @@ void temelFonk( char durum, int r, int c, char oyun[r][c])
         i = x - tmp.y;
         if( i > max_i ) {
             tmp.y = max_i + 1;
-            printf("1");
         } else {
             tmp.y = tmp.y + i;
-            printf("2");
         }
         if(koordKontrol(tmp, r, c, oyun)){
             eldeParca.y = tmp.y;
         }
-        printf("YES!");
         
         while( koordKontrol(eldeParca, r, c, oyun) )
         {
@@ -414,6 +400,7 @@ void temelFonk( char durum, int r, int c, char oyun[r][c])
         parcaGetir(r, c, oyun);
     }
 
+    /*a switch case to move the tetromino according to the player's input*/
     switch( durum ) {
         case 'x':
             while( koordKontrol(eldeParca, r, c, oyun) )
@@ -554,16 +541,16 @@ int main ()
     int b = 0;
 
     tetrisText(b, a);
-    printf("Hosgeldiniz!\n");    
-    printf("Sizden tahtanin boyutlari istenecektir.\n");    
-    printf("Devam etmek icin herhangi bir tusa basiniz.\n");
+    printf("Welcome!\n");    
+    printf("You will be asked to enter the dimensions of the mainBoard\n");    
+    printf("press any KEY to contintue.\n");
     getChar();    
     printf("\n");
     printf("═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n");
-    printf("lutfen satir sayisini giriniz: ");
+    printf("please enter num of rows: ");
     scanf("%d", &r);
     printf("\n");
-    printf("lutfen sutun sayisini giriniz: ");
+    printf("please enter num of coloumns: ");
     scanf("%d",&c);
 
     loadingScreen();

@@ -12,7 +12,7 @@
   First, let's imagine the gameboard and its tetrimnoes as matrices:<br> 
     ![a](./img/graph1.png)
   After that, we can easily imagine how the code of the tetrominoes would be:
-```
+```c
 /*This Struct is used to save information about the tetromino*/
 typedef struct {
     char **boyut;
@@ -39,7 +39,7 @@ const Parca parcalar[PARCALAR] = {
 So, how much easy it is to check the full rows and overwrite the above ones?<br>
 <img style="float: left" src="./img/graph2.png" alt="graph2" width="500"/>
 
-```
+```c
 void skorlama( int r, int c, char oyun[r][c])
 {
  int i, j, sum, count=0;
@@ -66,7 +66,7 @@ As always, while 0s indicates empty areas 1s will indicate full ones. <br>
 However, The tetromino that the player contols should be displayed in a different way so we print it as a buffer.
 ![a](./img/graph3.png)
 
-```
+```c
 oid printleme( int r, int c, char oyun[r][c])
 {
  char Buffer[r][c];
